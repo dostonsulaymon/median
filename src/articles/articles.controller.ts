@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -39,8 +40,12 @@ export class ArticlesController {
 
   @Get(':id')
   @ApiOkResponse({ type: ArticleEntity })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.articlesService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const article = this.articlesService.findOne(id);
+    if (!article) {
+      throw new NotFoundException(`Article with id ${id} not found`);
+    }
+    return article;
   }
 
   @Patch(':id')
