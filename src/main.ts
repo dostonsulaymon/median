@@ -20,4 +20,6 @@ async function bootstrap() {
   await app.listen(PORT);
 }
 
-bootstrap();
+bootstrap().then(() => {
+  console.log('Server started on port', PORT);
+});
