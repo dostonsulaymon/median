@@ -1,39 +1,27 @@
-import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './app.module';
-import * as process from 'node:process';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import morgan from 'morgan';
-import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+// src/main.ts
 
-const PORT = process.env.PORT || 3000;
+import { NestFactory, Reflector } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import * as process from 'node:process';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(morgan('dev'));
-  // Apply global validation pipe
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  // Use 'dev' format for development
-
-  // Setup Swagger API documentation
   const config = new DocumentBuilder()
     .setTitle('Median')
     .setDescription('The Median API description')
-    .setVersion('1.0')
+    .setVersion('0.1')
+    .addBearerAuth()
     .build();
-
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document); // Change to '/docs' if needed
+  SwaggerModule.setup('api', app, document);
 
-  const { httpAdapter } = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
-
-  // Start the application
-  await app.listen(PORT);
-  console.log(`Server started on port ${PORT}`);
+  await app.listen(process.env.PORT);
 }
 
 bootstrap();
