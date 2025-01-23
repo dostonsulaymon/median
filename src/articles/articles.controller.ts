@@ -33,7 +33,7 @@ export class ArticlesController {
   }
 
   @Get()
-  @ApiOkResponse({ type: ArticleEntity })
+  @ApiOkResponse({ type: ArticleEntity, isArray: true })
   findAll() {
     return this.articlesService.findAll();
   }

@@ -1,8 +1,8 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as process from 'node:process';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import morgan from 'morgan';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 
@@ -14,6 +14,7 @@ async function bootstrap() {
   app.use(morgan('dev'));
   // Apply global validation pipe
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   // Use 'dev' format for development
 
